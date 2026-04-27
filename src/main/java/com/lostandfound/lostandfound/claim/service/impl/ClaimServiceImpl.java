@@ -82,8 +82,16 @@ public class ClaimServiceImpl implements ClaimService {
         claim.setStatus(status);
         claimMapper.updateById(claim);
 
-        // 如果审批通过，把物品状态改为claimed
         if ("approved".equals(status)) {
+            // 把同一物品的其他pending申请全部拒绝
+            claimMapper.update(null,
+                    new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<Claim>()
+                            .eq(Claim::getItemId, claim.getItemId())
+                            .ne(Claim::getId, id)
+                            .eq(Claim::getStatus, "pending")
+                            .set(Claim::getStatus, "rejected")
+            );
+            // 物品状态变为claimed
             Item item = itemMapper.selectById(claim.getItemId());
             if (item != null) {
                 item.setStatus("claimed");

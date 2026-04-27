@@ -3,6 +3,7 @@ package com.lostandfound.lostandfound.item.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lostandfound.lostandfound.claim.mapper.ClaimMapper;
 import com.lostandfound.lostandfound.common.Result;
 import com.lostandfound.lostandfound.item.dto.ItemCreateDTO;
 import com.lostandfound.lostandfound.item.dto.ItemQueryDTO;
@@ -15,6 +16,8 @@ import com.lostandfound.lostandfound.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import com.lostandfound.lostandfound.claim.entity.Claim;
+import com.lostandfound.lostandfound.claim.mapper.ClaimMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +28,7 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemMapper itemMapper;
     private final UserMapper userMapper;
+    private final ClaimMapper claimMapper;
 
     @Override
     public Result<ItemVO> createItem(ItemCreateDTO dto) {
@@ -94,6 +98,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Result<Void> deleteItem(Long id) {
+        // 先删除关联的claim记录
+
+        claimMapper.delete(
+                new LambdaQueryWrapper<Claim>()
+                        .eq(Claim::getItemId, id)
+        );
+        // 再删除物品
         itemMapper.deleteById(id);
         return Result.success();
     }
