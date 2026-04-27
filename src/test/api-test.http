@@ -1,0 +1,59 @@
+### 注册
+POST http://localhost:8080/api/user/register
+Content-Type: application/json
+
+{
+  "studentId": "125001001",
+  "username": "Test User",
+  "password": "123456",
+  "email": "125001001@link.cuhk.edu.cn",
+  "phone": "13900001111"
+}
+
+### 登录
+POST http://localhost:8080/api/user/login
+Content-Type: application/json
+
+{
+  "studentId": "125001001",
+  "password": "123456"
+}
+
+### 根据ID查询用户
+GET http://localhost:8080/api/user/1
+
+### 创建物品
+POST http://localhost:8080/api/item
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "type": "lost",
+  "title": "丢失蓝色背包",
+  "description": "蓝色Nike背包，内有MacBook",
+  "category": "背包",
+  "location": "图书馆三楼",
+  "lostDate": "2026-04-27"
+}
+
+### 查询物品
+GET http://localhost:8080/api/item/1
+
+### 查询列表
+GET http://localhost:8080/api/item/list?type=lost&page=1&size=10
+
+### 提交认领（user 3 认领 item 1）
+POST http://localhost:8080/api/claim
+Content-Type: application/json
+
+{
+  "itemId": 1,
+  "userId": 3,
+  "message": "这个钱包是我的，里面有我的学生证"
+}
+
+### 查看某物品的所有认领
+GET http://localhost:8080/api/item/1
+
+### 审批通过
+PUT http://localhost:8080/api/claim/10/status?status=approved
