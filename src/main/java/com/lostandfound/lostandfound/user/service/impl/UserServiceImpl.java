@@ -1,6 +1,5 @@
 package com.lostandfound.lostandfound.user.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lostandfound.lostandfound.common.Result;
 import com.lostandfound.lostandfound.user.dto.UserLoginDTO;
 import com.lostandfound.lostandfound.user.dto.UserRegisterDTO;
@@ -19,10 +18,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result<UserVO> login(UserLoginDTO dto) {
-        User user = userMapper.selectOne(
-                new LambdaQueryWrapper<User>()
-                        .eq(User::getStudentId, dto.getStudentId())
-                        .eq(User::getPassword, dto.getPassword())
+        User user = userMapper.findByStudentIdAndPassword(
+                dto.getStudentId(), dto.getPassword()
         );
         if (user == null) {
             return Result.fail("学号或密码错误");
@@ -32,11 +29,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result<UserVO> register(UserRegisterDTO dto) {
-        // 检查学号是否已存在
-        Long count = userMapper.selectCount(
-                new LambdaQueryWrapper<User>()
-                        .eq(User::getStudentId, dto.getStudentId())
-        );
+        long count = userMapper.countByStudentId(dto.getStudentId());
         if (count > 0) {
             return Result.fail("该学号已注册");
         }

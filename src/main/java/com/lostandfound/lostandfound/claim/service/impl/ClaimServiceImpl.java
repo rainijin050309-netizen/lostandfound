@@ -1,6 +1,5 @@
 package com.lostandfound.lostandfound.claim.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lostandfound.lostandfound.claim.dto.ClaimCreateDTO;
 import com.lostandfound.lostandfound.claim.entity.Claim;
 import com.lostandfound.lostandfound.claim.mapper.ClaimMapper;
@@ -27,7 +26,6 @@ public class ClaimServiceImpl implements ClaimService {
 
     @Override
     public Result<ClaimVO> createClaim(ClaimCreateDTO dto) {
-        // 检查物品是否存在
         Item item = itemMapper.selectById(dto.getItemId());
         if (item == null) {
             return Result.fail("物品不存在");
@@ -35,11 +33,8 @@ public class ClaimServiceImpl implements ClaimService {
         if (!"open".equals(item.getStatus())) {
             return Result.fail("该物品已关闭认领");
         }
-        // 检查是否已经认领过
-        Long count = claimMapper.selectCount(
-                new LambdaQueryWrapper<Claim>()
-                        .eq(Claim::getItemId, dto.getItemId())
-                        .eq(Claim::getUserId, dto.getUserId())
+        long count = claimMapper.countByItemIdAndUserId(
+                dto.getItemId(), dto.getUserId()
         );
         if (count > 0) {
             return Result.fail("你已经提交过认领申请");
@@ -55,22 +50,18 @@ public class ClaimServiceImpl implements ClaimService {
 
     @Override
     public Result<List<ClaimVO>> getClaimsByItemId(Long itemId) {
-        List<Claim> claims = claimMapper.selectList(
-                new LambdaQueryWrapper<Claim>()
-                        .eq(Claim::getItemId, itemId)
-                        .orderByDesc(Claim::getCreatedAt)
+        List<Claim> claims = claimMapper.findByItemId(itemId);
+        return Result.success(
+                claims.stream().map(this::toVO).collect(Collectors.toList())
         );
-        return Result.success(claims.stream().map(this::toVO).collect(Collectors.toList()));
     }
 
     @Override
     public Result<List<ClaimVO>> getClaimsByUserId(Long userId) {
-        List<Claim> claims = claimMapper.selectList(
-                new LambdaQueryWrapper<Claim>()
-                        .eq(Claim::getUserId, userId)
-                        .orderByDesc(Claim::getCreatedAt)
+        List<Claim> claims = claimMapper.findByUserId(userId);
+        return Result.success(
+                claims.stream().map(this::toVO).collect(Collectors.toList())
         );
-        return Result.success(claims.stream().map(this::toVO).collect(Collectors.toList()));
     }
 
     @Override
@@ -81,17 +72,8 @@ public class ClaimServiceImpl implements ClaimService {
         }
         claim.setStatus(status);
         claimMapper.updateById(claim);
-
         if ("approved".equals(status)) {
-            // 把同一物品的其他pending申请全部拒绝
-            claimMapper.update(null,
-                    new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<Claim>()
-                            .eq(Claim::getItemId, claim.getItemId())
-                            .ne(Claim::getId, id)
-                            .eq(Claim::getStatus, "pending")
-                            .set(Claim::getStatus, "rejected")
-            );
-            // 物品状态变为claimed
+            claimMapper.rejectOtherClaims(claim.getItemId(), id);
             Item item = itemMapper.selectById(claim.getItemId());
             if (item != null) {
                 item.setStatus("claimed");
@@ -109,7 +91,6 @@ public class ClaimServiceImpl implements ClaimService {
         vo.setMessage(claim.getMessage());
         vo.setStatus(claim.getStatus());
         vo.setCreatedAt(claim.getCreatedAt());
-
         Item item = itemMapper.selectById(claim.getItemId());
         if (item != null) {
             vo.setItemTitle(item.getTitle());

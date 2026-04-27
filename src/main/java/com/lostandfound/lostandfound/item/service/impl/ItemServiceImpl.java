@@ -1,8 +1,5 @@
 package com.lostandfound.lostandfound.item.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lostandfound.lostandfound.claim.mapper.ClaimMapper;
 import com.lostandfound.lostandfound.common.Result;
 import com.lostandfound.lostandfound.item.dto.ItemCreateDTO;
@@ -15,9 +12,6 @@ import com.lostandfound.lostandfound.user.entity.User;
 import com.lostandfound.lostandfound.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import com.lostandfound.lostandfound.claim.entity.Claim;
-import com.lostandfound.lostandfound.claim.mapper.ClaimMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -60,26 +54,18 @@ public class ItemServiceImpl implements ItemService {
     public Result<List<ItemVO>> queryItems(ItemQueryDTO dto) {
         int page = dto.getPage() != null ? dto.getPage() : 1;
         int size = dto.getSize() != null ? dto.getSize() : 10;
+        int offset = (page - 1) * size;
 
-        LambdaQueryWrapper<Item> wrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.hasText(dto.getType())) {
-            wrapper.eq(Item::getType, dto.getType());
-        }
-        if (StringUtils.hasText(dto.getCategory())) {
-            wrapper.eq(Item::getCategory, dto.getCategory());
-        }
-        if (StringUtils.hasText(dto.getStatus())) {
-            wrapper.eq(Item::getStatus, dto.getStatus());
-        }
-        if (StringUtils.hasText(dto.getKeyword())) {
-            wrapper.and(w -> w.like(Item::getTitle, dto.getKeyword())
-                    .or().like(Item::getDescription, dto.getKeyword()));
-        }
-        wrapper.orderByDesc(Item::getCreatedAt);
+        List<Item> items = itemMapper.findByCondition(
+                dto.getType(),
+                dto.getCategory(),
+                dto.getStatus(),
+                dto.getKeyword(),
+                offset,
+                size
+        );
 
-        IPage<Item> pageResult = itemMapper.selectPage(new Page<>(page, size), wrapper);
-        List<ItemVO> list = pageResult.getRecords()
-                .stream()
+        List<ItemVO> list = items.stream()
                 .map(this::toVO)
                 .collect(Collectors.toList());
         return Result.success(list);
@@ -98,13 +84,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Result<Void> deleteItem(Long id) {
-        // 先删除关联的claim记录
-
-        claimMapper.delete(
-                new LambdaQueryWrapper<Claim>()
-                        .eq(Claim::getItemId, id)
-        );
-        // 再删除物品
+        claimMapper.deleteByItemId(id);
         itemMapper.deleteById(id);
         return Result.success();
     }
@@ -123,8 +103,6 @@ public class ItemServiceImpl implements ItemService {
         vo.setImageUrl(item.getImageUrl());
         vo.setStatus(item.getStatus());
         vo.setCreatedAt(item.getCreatedAt());
-
-        // 查询发布者用户名
         User user = userMapper.selectById(item.getUserId());
         if (user != null) {
             vo.setUsername(user.getUsername());
