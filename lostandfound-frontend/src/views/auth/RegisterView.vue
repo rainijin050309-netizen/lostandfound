@@ -1,28 +1,31 @@
 <template>
   <div class="auth-container">
     <el-card class="auth-card">
-      <h2>校园失物招领</h2>
-      <h3>注册</h3>
-      <el-form :model="form" label-width="80px">
-        <el-form-item label="学号">
-          <el-input v-model="form.studentId" placeholder="请输入9位学号" />
+      <div style="text-align:right;margin-bottom:8px">
+        <el-button size="small" @click="toggleLocale">{{ locale === 'zh' ? 'EN' : '中' }}</el-button>
+      </div>
+      <h2>{{ $t('auth.appTitle') }}</h2>
+      <h3>{{ $t('auth.register') }}</h3>
+      <el-form :model="form" label-width="90px">
+        <el-form-item :label="$t('auth.studentId')">
+          <el-input v-model="form.studentId" :placeholder="$t('auth.studentIdPlaceholder9')" />
         </el-form-item>
-        <el-form-item label="用户名">
-          <el-input v-model="form.username" placeholder="请输入用户名" />
+        <el-form-item :label="$t('auth.username')">
+          <el-input v-model="form.username" :placeholder="$t('auth.usernamePlaceholder')" />
         </el-form-item>
-        <el-form-item label="密码">
-          <el-input v-model="form.password" type="password" placeholder="请输入密码" />
+        <el-form-item :label="$t('auth.password')">
+          <el-input v-model="form.password" type="password" :placeholder="$t('auth.passwordPlaceholder')" />
         </el-form-item>
-        <el-form-item label="手机号">
-          <el-input v-model="form.phone" placeholder="请输入手机号" />
+        <el-form-item :label="$t('auth.phone')">
+          <el-input v-model="form.phone" :placeholder="$t('auth.phonePlaceholder')" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleRegister" :loading="loading" style="width:100%">
-            注册
+            {{ $t('auth.registerBtn') }}
           </el-button>
         </el-form-item>
         <div style="text-align:center">
-          已有账号？<router-link to="/login">立即登录</router-link>
+          <router-link to="/login">{{ $t('auth.toLogin') }}</router-link>
         </div>
       </el-form>
     </el-card>
@@ -33,23 +36,25 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import { register } from '../../api/user'
 import { useUserStore } from '../../stores/user'
 
+const { t, locale } = useI18n()
 const router = useRouter()
 const userStore = useUserStore()
 
-const form = ref({
-  studentId: '',
-  username: '',
-  password: '',
-  phone: ''
-})
+const form = ref({ studentId: '', username: '', password: '', phone: '' })
 const loading = ref(false)
+
+const toggleLocale = () => {
+  locale.value = locale.value === 'zh' ? 'en' : 'zh'
+  localStorage.setItem('locale', locale.value)
+}
 
 const handleRegister = async () => {
   if (!form.value.studentId || !form.value.username || !form.value.password) {
-    ElMessage.warning('请填写完整信息')
+    ElMessage.warning(t('msg.fillComplete'))
     return
   }
   loading.value = true
@@ -59,7 +64,7 @@ const handleRegister = async () => {
       email: `${form.value.studentId}@link.cuhk.edu.cn`
     })
     userStore.setUser(res.data)
-    ElMessage.success('注册成功')
+    ElMessage.success(t('msg.registerSuccess'))
     router.push('/home')
   } finally {
     loading.value = false
@@ -75,17 +80,7 @@ const handleRegister = async () => {
   min-height: 100vh;
   background: #f5f5f5;
 }
-.auth-card {
-  width: 400px;
-}
-h2 {
-  text-align: center;
-  color: #409eff;
-  margin-bottom: 8px;
-}
-h3 {
-  text-align: center;
-  margin-bottom: 24px;
-  color: #333;
-}
+.auth-card { width: 400px; }
+h2 { text-align: center; color: #409eff; margin-bottom: 8px; }
+h3 { text-align: center; margin-bottom: 24px; color: #333; }
 </style>

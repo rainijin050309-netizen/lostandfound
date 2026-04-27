@@ -2,22 +2,25 @@
   <div>
     <el-container>
       <el-header style="background:#409eff;display:flex;align-items:center;justify-content:space-between">
-        <span style="color:white;font-size:18px;font-weight:bold">校园失物招领</span>
-        <div>
+        <span style="color:white;font-size:18px;font-weight:bold">{{ $t('nav.title') }}</span>
+        <div style="display:flex;align-items:center;gap:8px">
           <el-button v-if="userStore.userInfo" @click="router.push('/publish')" type="success" size="small">
-            发布信息
+            {{ $t('nav.publish') }}
           </el-button>
-          <el-button v-if="userStore.userInfo" @click="router.push('/my-claims')" size="small" style="margin-left:8px">
-            我的认领
+          <el-button v-if="userStore.userInfo" @click="router.push('/my-claims')" size="small">
+            {{ $t('nav.myClaims') }}
           </el-button>
-          <el-button v-if="userStore.isAdmin()" @click="router.push('/admin')" type="warning" size="small" style="margin-left:8px">
-            管理后台
+          <el-button v-if="userStore.isAdmin()" @click="router.push('/admin')" type="warning" size="small">
+            {{ $t('nav.admin') }}
           </el-button>
-          <el-button v-if="userStore.userInfo" @click="handleLogout" size="small" style="margin-left:8px">
-            退出 {{ userStore.userInfo.username }}
+          <el-button v-if="userStore.userInfo" @click="handleLogout" size="small">
+            {{ $t('nav.logout') }} {{ userStore.userInfo.username }}
           </el-button>
           <el-button v-else @click="router.push('/login')" type="primary" size="small">
-            登录
+            {{ $t('nav.login') }}
+          </el-button>
+          <el-button size="small" @click="toggleLocale" style="margin-left:4px">
+            {{ locale === 'zh' ? 'EN' : '中' }}
           </el-button>
         </div>
       </el-header>
@@ -25,23 +28,23 @@
       <el-main>
         <el-row :gutter="16" style="margin-bottom:16px">
           <el-col :span="6">
-            <el-select v-model="query.type" placeholder="类型" clearable @change="loadItems">
-              <el-option label="失物" value="lost" />
-              <el-option label="招领" value="found" />
+            <el-select v-model="query.type" :placeholder="$t('home.type')" clearable @change="loadItems">
+              <el-option :label="$t('home.lost')" value="lost" />
+              <el-option :label="$t('home.found')" value="found" />
             </el-select>
           </el-col>
           <el-col :span="6">
-            <el-select v-model="query.status" placeholder="状态" clearable @change="loadItems">
-              <el-option label="待认领" value="open" />
-              <el-option label="已认领" value="claimed" />
-              <el-option label="已关闭" value="closed" />
+            <el-select v-model="query.status" :placeholder="$t('home.status')" clearable @change="loadItems">
+              <el-option :label="$t('home.open')" value="open" />
+              <el-option :label="$t('home.claimed')" value="claimed" />
+              <el-option :label="$t('home.closed')" value="closed" />
             </el-select>
           </el-col>
           <el-col :span="8">
-            <el-input v-model="query.keyword" placeholder="搜索关键词" @keyup.enter="loadItems" clearable />
+            <el-input v-model="query.keyword" :placeholder="$t('home.keyword')" @keyup.enter="loadItems" clearable />
           </el-col>
           <el-col :span="4">
-            <el-button type="primary" @click="loadItems">搜索</el-button>
+            <el-button type="primary" @click="loadItems">{{ $t('home.search') }}</el-button>
           </el-col>
         </el-row>
 
@@ -52,23 +55,23 @@
                 <div style="display:flex;justify-content:space-between;align-items:center">
                   <span>{{ item.title }}</span>
                   <el-tag :type="item.type === 'lost' ? 'danger' : 'success'">
-                    {{ item.type === 'lost' ? '失物' : '招领' }}
+                    {{ item.type === 'lost' ? $t('home.lost') : $t('home.found') }}
                   </el-tag>
                 </div>
               </template>
               <p style="color:#666;font-size:13px">{{ item.description }}</p>
               <p style="font-size:12px;color:#999">
-                地点：{{ item.location }} | 发布者：{{ item.username }}
+                {{ $t('home.location') }}：{{ item.location }} | {{ $t('home.publisher') }}：{{ item.username }}
               </p>
               <p style="font-size:12px;color:#999">{{ item.createdAt }}</p>
               <el-tag size="small" :type="item.status === 'open' ? 'primary' : 'info'">
-                {{ item.status === 'open' ? '待认领' : item.status === 'claimed' ? '已认领' : '已关闭' }}
+                {{ item.status === 'open' ? $t('home.open') : item.status === 'claimed' ? $t('home.claimed') : $t('home.closed') }}
               </el-tag>
             </el-card>
           </el-col>
         </el-row>
 
-        <el-empty v-if="!loading && items.length === 0" description="暂无数据" />
+        <el-empty v-if="!loading && items.length === 0" :description="$t('home.noData')" />
       </el-main>
     </el-container>
   </div>
@@ -78,15 +81,22 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import { queryItems } from '../../api/item'
 import { useUserStore } from '../../stores/user'
 
+const { t, locale } = useI18n()
 const router = useRouter()
 const userStore = useUserStore()
 
 const items = ref([])
 const loading = ref(false)
 const query = ref({ type: '', status: '', keyword: '', page: 1, size: 12 })
+
+const toggleLocale = () => {
+  locale.value = locale.value === 'zh' ? 'en' : 'zh'
+  localStorage.setItem('locale', locale.value)
+}
 
 const loadItems = async () => {
   loading.value = true
@@ -100,7 +110,7 @@ const loadItems = async () => {
 
 const handleLogout = () => {
   userStore.clearUser()
-  ElMessage.success('已退出登录')
+  ElMessage.success(t('msg.logoutSuccess'))
   router.push('/login')
 }
 
