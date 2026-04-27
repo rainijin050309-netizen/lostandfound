@@ -35,6 +35,14 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/stats',
+      component: () => import('../views/stats/StatsView.vue')
+    },
+    {
+      path: '/llm-query',
+      component: () => import('../views/llm/LlmQueryView.vue')
+    },
+    {
       path: '/admin',
       component: () => import('../views/admin/AdminView.vue'),
       meta: { requiresAuth: true, requiresAdmin: true }
