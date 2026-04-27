@@ -10,6 +10,12 @@
           <el-button v-if="userStore.userInfo" @click="router.push('/my-claims')" size="small" style="margin-left:8px">
             我的认领
           </el-button>
+          <el-button @click="router.push('/stats')" size="small" type="info" style="margin-left:8px">
+            数据统计
+          </el-button>
+          <el-button @click="router.push('/llm-query')" size="small" type="primary" plain style="margin-left:8px">
+            LLM 查询
+          </el-button>
           <el-button v-if="userStore.isAdmin()" @click="router.push('/admin')" type="warning" size="small" style="margin-left:8px">
             管理后台
           </el-button>
