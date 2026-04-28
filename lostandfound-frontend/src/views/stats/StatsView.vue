@@ -1,53 +1,53 @@
 <template>
   <div style="max-width:1100px;margin:24px auto;padding:0 16px">
-    <el-button @click="router.push('/home')" style="margin-bottom:16px">返回首页</el-button>
+    <el-button @click="router.push('/home')" style="margin-bottom:16px">Back to Home</el-button>
 
     <el-card style="margin-bottom:16px">
-      <template #header>系统统计总览</template>
+      <template #header>System Statistics Overview</template>
       <el-row :gutter="12" v-loading="loadingOverview">
-        <el-col :span="6"><el-statistic title="失物条目" :value="toNum(overview.total_lost_items)" /></el-col>
-        <el-col :span="6"><el-statistic title="招领条目" :value="toNum(overview.total_found_items)" /></el-col>
-        <el-col :span="6"><el-statistic title="匹配数" :value="toNum(overview.total_matches)" /></el-col>
-        <el-col :span="6"><el-statistic title="认领总数" :value="toNum(overview.total_claims)" /></el-col>
+        <el-col :span="6"><el-statistic title="Lost Items" :value="toNum(overview.total_lost_items)" /></el-col>
+        <el-col :span="6"><el-statistic title="Found Items" :value="toNum(overview.total_found_items)" /></el-col>
+        <el-col :span="6"><el-statistic title="Matches" :value="toNum(overview.total_matches)" /></el-col>
+        <el-col :span="6"><el-statistic title="Total Claims" :value="toNum(overview.total_claims)" /></el-col>
       </el-row>
       <el-row :gutter="12" style="margin-top:10px" v-loading="loadingOverview">
-        <el-col :span="8"><el-statistic title="已通过" :value="toNum(overview.approved_claims)" /></el-col>
-        <el-col :span="8"><el-statistic title="待处理" :value="toNum(overview.pending_claims)" /></el-col>
-        <el-col :span="8"><el-statistic title="已拒绝" :value="toNum(overview.rejected_claims)" /></el-col>
+        <el-col :span="8"><el-statistic title="Approved" :value="toNum(overview.approved_claims)" /></el-col>
+        <el-col :span="8"><el-statistic title="Pending" :value="toNum(overview.pending_claims)" /></el-col>
+        <el-col :span="8"><el-statistic title="Rejected" :value="toNum(overview.rejected_claims)" /></el-col>
       </el-row>
     </el-card>
 
     <el-row :gutter="16">
       <el-col :span="12">
         <el-card>
-          <template #header>分类分布（失物/招领）</template>
+          <template #header>Category Distribution (Lost / Found)</template>
           <el-table :data="categoryRows" size="small" v-loading="loadingCategory">
-            <el-table-column prop="category" label="分类" min-width="120" />
-            <el-table-column prop="lost" label="失物" width="90" />
-            <el-table-column prop="found" label="招领" width="90" />
-            <el-table-column prop="total" label="合计" width="90" />
+            <el-table-column prop="category" label="Category" min-width="120" />
+            <el-table-column prop="lost" label="Lost" width="90" />
+            <el-table-column prop="found" label="Found" width="90" />
+            <el-table-column prop="total" label="Total" width="90" />
           </el-table>
         </el-card>
       </el-col>
 
       <el-col :span="12">
         <el-card>
-          <template #header>高频地点 Top10</template>
+          <template #header>Top 10 Locations</template>
           <el-table :data="locationRows" size="small" v-loading="loadingLocation">
-            <el-table-column prop="location" label="地点" min-width="150" />
-            <el-table-column prop="count" label="数量" width="100" />
+            <el-table-column prop="location" label="Location" min-width="150" />
+            <el-table-column prop="count" label="Count" width="100" />
           </el-table>
         </el-card>
       </el-col>
     </el-row>
 
     <el-card style="margin-top:16px">
-      <template #header>月度趋势</template>
+      <template #header>Monthly Trends</template>
       <el-table :data="monthlyRows" size="small" v-loading="loadingMonthly">
-        <el-table-column prop="month" label="月份" width="140" />
-        <el-table-column prop="lost" label="失物" width="100" />
-        <el-table-column prop="found" label="招领" width="100" />
-        <el-table-column prop="total" label="总量" width="100" />
+        <el-table-column prop="month" label="Month" width="140" />
+        <el-table-column prop="lost" label="Lost" width="100" />
+        <el-table-column prop="found" label="Found" width="100" />
+        <el-table-column prop="total" label="Total" width="100" />
       </el-table>
     </el-card>
   </div>
