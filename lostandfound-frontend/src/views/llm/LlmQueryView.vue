@@ -1,20 +1,20 @@
 <template>
   <div style="max-width:1000px;margin:24px auto;padding:0 16px">
-    <el-button @click="router.push('/home')" style="margin-bottom:16px">返回首页</el-button>
+    <el-button @click="router.push('/home')" style="margin-bottom:16px">Back to Home</el-button>
 
     <el-card>
-      <template #header>自然语言查询（LLM）</template>
+      <template #header>Natural Language Query (LLM)</template>
 
       <el-input
         v-model="query"
         type="textarea"
         :rows="4"
-        placeholder="例如：查找最近在图书馆丢失的电子产品"
+        placeholder="e.g., Find electronic devices lost recently in the library"
       />
 
       <div style="margin-top:12px;display:flex;gap:8px">
-        <el-button type="primary" :loading="loading" @click="handleRun">执行查询</el-button>
-        <el-button @click="query = ''">清空</el-button>
+        <el-button type="primary" :loading="loading" @click="handleRun">Execute Query</el-button>
+        <el-button @click="query = ''">Clear</el-button>
       </div>
 
       <el-divider />
@@ -29,22 +29,22 @@
       />
 
       <el-descriptions v-if="sqlText" :column="1" border>
-        <el-descriptions-item label="生成 SQL">
+        <el-descriptions-item label="Generated SQL">
           <pre style="white-space:pre-wrap;margin:0">{{ sqlText }}</pre>
         </el-descriptions-item>
-        <el-descriptions-item label="结果条数">{{ resultCount }}</el-descriptions-item>
+        <el-descriptions-item label="Result Count">{{ resultCount }}</el-descriptions-item>
       </el-descriptions>
 
       <el-table v-if="rows.length > 0" :data="rows" style="margin-top:12px" size="small">
         <el-table-column prop="item_id" label="ID" width="80" />
-        <el-table-column prop="name" label="标题" min-width="160" />
-        <el-table-column prop="category" label="分类" width="120" />
-        <el-table-column prop="location" label="地点" width="140" />
-        <el-table-column prop="date" label="日期" width="120" />
-        <el-table-column prop="status" label="类型" width="100" />
+        <el-table-column prop="name" label="Title" min-width="160" />
+        <el-table-column prop="category" label="Category" width="120" />
+        <el-table-column prop="location" label="Location" width="140" />
+        <el-table-column prop="date" label="Date" width="120" />
+        <el-table-column prop="status" label="Type" width="100" />
       </el-table>
 
-      <el-empty v-if="!loading && sqlText && rows.length === 0" description="查询成功，但没有匹配数据" />
+      <el-empty v-if="!loading && sqlText && rows.length === 0" description="Query successful, but no matching data found" />
     </el-card>
   </div>
 </template>
@@ -65,7 +65,7 @@ const rows = ref([])
 
 const handleRun = async () => {
   if (!query.value.trim()) {
-    errorMsg.value = '请输入查询语句'
+    errorMsg.value = 'Please insert the query statement.'
     return
   }
 
@@ -82,7 +82,7 @@ const handleRun = async () => {
     rows.value = data.results || []
     resultCount.value = Number(data.count || 0)
   } catch (_error) {
-    errorMsg.value = 'LLM 查询失败，请确认 Python LLM 服务已启动（默认 5000 端口）'
+    errorMsg.value = 'LLM query failed. Please confirm that the Python LLM service is running (default port 5000)'
   } finally {
     loading.value = false
   }
