@@ -27,6 +27,10 @@
         <el-descriptions-item :label="$t('item.description')" :span="2">{{ item.description }}</el-descriptions-item>
       </el-descriptions>
 
+      <div style="margin-top:16px" v-if="item.imageUrl">
+        <img :src="item.imageUrl" style="max-width:100%;max-height:400px;border-radius:8px" />
+      </div>
+
       <div style="margin-top:16px" v-if="userStore.userInfo && item.status === 'open' && userStore.userInfo.id !== item.userId">
         <el-button type="primary" @click="showClaimDialog = true">
           {{ item.type === 'lost' ? $t('item.iFoundIt') : $t('item.applyClaim') }}

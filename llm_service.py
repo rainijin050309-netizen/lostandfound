@@ -92,7 +92,10 @@ def generate_sql_from_nl(user_query):
     try:
         from openai import OpenAI
 
-        client = OpenAI(api_key=api_key)
+        client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.openai-proxy.org/v1"
+        )
         system_prompt = (
             "You are an SQL generator. Convert user query into SQL for the item table. "
             "Only output one safe SELECT statement without semicolon. "

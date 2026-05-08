@@ -21,14 +21,18 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
-
 llm:
   service:
     port: 5000
   openai:
-    api-key: ""
+    api-key: "sk-757VSHy8u5RzpZoHv4rNTD9AdoErtchmoePsIFflWJaC7v84"
     model: gpt-4o-mini
   proxy:
     url: http://127.0.0.1:5000/llm-query
     connect-timeout-ms: 3000
     read-timeout-ms: 15000
+
+
+file:
+  upload-path: C:/uploads/lostandfound/
+  access-path: /uploads/**

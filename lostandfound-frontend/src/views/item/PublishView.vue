@@ -37,6 +37,20 @@
         <el-form-item :label="$t('publish.description')">
           <el-input v-model="form.description" type="textarea" :rows="4" :placeholder="$t('publish.descriptionPlaceholder')" />
         </el-form-item>
+        <el-form-item label="Image">
+          <el-upload
+            :action="`http://localhost:8080/api/upload`"
+            :limit="1"
+            :on-success="handleUploadSuccess"
+            :on-remove="handleUploadRemove"
+            accept=".jpg,.jpeg,.png,.gif"
+            list-type="picture">
+            <el-button type="primary">Upload Image</el-button>
+            <template #tip>
+              <div style="color:#999;font-size:12px">jpg / png / gif, optional</div>
+            </template>
+          </el-upload>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handlePublish" :loading="loading" style="width:100%">
             {{ $t('publish.submit') }}
@@ -59,8 +73,15 @@ const { t } = useI18n()
 const router = useRouter()
 const userStore = useUserStore()
 
-const form = ref({ type: 'lost', title: '', category: '', location: '', date: '', description: '' })
+const form = ref({ type: 'lost', title: '', category: '', location: '', date: '', description: '',imageUrl: null })
 const loading = ref(false)
+const handleUploadSuccess = (res) => {
+  form.value.imageUrl = res.data
+}
+
+const handleUploadRemove = () => {
+  form.value.imageUrl = null
+}
 
 const handlePublish = async () => {
   if (!form.value.title || !form.value.location) {
@@ -77,7 +98,8 @@ const handlePublish = async () => {
       location: form.value.location,
       lostDate: form.value.type === 'lost' ? form.value.date : null,
       foundDate: form.value.type === 'found' ? form.value.date : null,
-      description: form.value.description
+      description: form.value.description,
+      imageUrl: form.value.imageUrl
     })
     ElMessage.success(t('msg.publishSuccess'))
     router.push('/home')

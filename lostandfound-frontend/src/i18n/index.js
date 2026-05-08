@@ -8,7 +8,9 @@ const messages = {
       myClaims: '我的认领',
       admin: '管理后台',
       logout: '退出',
-      login: '登录'
+      login: '登录',
+      stats: '数据统计',
+      llmQuery: 'LLM 查询'
     },
     home: {
       type: '类型',
@@ -131,6 +133,23 @@ const messages = {
       confirmDelete: '确认删除该物品？此操作不可撤销',
       tip: '提示',
       warning: '警告'
+    },
+    llm: {
+      title: '自然语言查询（LLM）',
+      placeholder: '例如：查找最近在图书馆丢失的电子产品',
+      run: '执行查询',
+      clear: '清空',
+      back: '返回首页',
+      generatedSql: '生成 SQL',
+      resultCount: '结果条数',
+      empty: '查询成功，但没有匹配数据',
+      error: 'LLM 查询失败，请确认 Python LLM 服务已启动（默认 5000 端口）',
+      colId: 'ID',
+      colTitle: '标题',
+      colCategory: '分类',
+      colLocation: '地点',
+      colDate: '日期',
+      colType: '类型'
     }
   },
   en: {
@@ -140,7 +159,9 @@ const messages = {
       myClaims: 'My Claims',
       admin: 'Admin Panel',
       logout: 'Logout',
-      login: 'Login'
+      login: 'Login',
+      stats: 'Statistics',
+      llmQuery: 'AI Query'
     },
     home: {
       type: 'Type',
@@ -263,6 +284,23 @@ const messages = {
       confirmDelete: 'Confirm deleting this item? This cannot be undone.',
       tip: 'Notice',
       warning: 'Warning'
+    },
+    llm: {
+      title: 'Natural Language Query (LLM)',
+      placeholder: 'e.g. Find lost electronics in the library recently',
+      run: 'Run Query',
+      clear: 'Clear',
+      back: 'Back to Home',
+      generatedSql: 'Generated SQL',
+      resultCount: 'Result Count',
+      empty: 'Query succeeded but no matching data found',
+      error: 'LLM query failed. Please make sure the Python LLM service is running (port 5000)',
+      colId: 'ID',
+      colTitle: 'Title',
+      colCategory: 'Category',
+      colLocation: 'Location',
+      colDate: 'Date',
+      colType: 'Type'
     }
   }
 }
